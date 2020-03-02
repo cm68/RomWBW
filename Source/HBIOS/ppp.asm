@@ -6,6 +6,12 @@
 ; TODO:
 ;   1) ADD SUPPORT FOR DSKY
 ;
+; adding support for USB and WIZNET
+;
+; i reuse the sector buffer for data payload
+; i have my own command/response buffer for the various commands I send to the SPI.
+;
+
 PPP_IO		.EQU	PPIBASE + 0	; PPP DATA I/O (PPI PORT A)
 PPP_CTL		.EQU	PPIBASE + 2	; PPP CTL LINES (PPI PORT C)
 PPP_PPICTL	.EQU	PPIBASE + 3	; PPI CONTROL PORT
