@@ -81,7 +81,7 @@ EOF
 echo "checking prerequisites"
 for need in ../CPM22/cpm_$BIOS.bin ../ZSDOS/zsys_$BIOS.bin \
 	../Forth/camel80.bin font8x11c.asm font8x11u.asm font8x16c.asm \
-	font8x16u.asm font8x8c.asm font8x8u.asm ; do 
+	font8x16u.asm font8x8c.asm font8x8u.asm ; do
 	if [ ! -f $need ] ; then
 		echo $need missing
 		exit 2
@@ -90,17 +90,20 @@ done
 
 cp ../Forth/camel80.bin .
 
-make dbgmon.bin prefix.bin romldr.bin eastaegg.bin nascom.bin \
-	tastybasic.bin game.bin usrrom.bin imgpad.bin imgpad0.bin
+make dbgmon.bin romldr.bin eastaegg.bin imgpad.bin
 
 if [ $platform != UNA ] ; then
+	make nascom.bin tastybasic.bin game.bin usrrom.bin imgpad0.bin
 	make hbios_rom.bin hbios_app.bin hbios_img.bin
 fi
 
 echo "Building $romname output files..."
 
 cat romldr.bin eastaegg.bin dbgmon.bin ../CPM22/cpm_$BIOS.bin ../ZSDOS/zsys_$BIOS.bin >osimg.bin
-cat camel80.bin nascom.bin tastybasic.bin game.bin imgpad0.bin usrrom.bin >osimg1.bin
+
+if [ $platform != UNA ] ; then
+	cat camel80.bin nascom.bin tastybasic.bin game.bin imgpad0.bin usrrom.bin >osimg1.bin
+fi
 
 echo "Building ${romsize}KB $romname ROM disk data file..."
 
@@ -121,8 +124,10 @@ if [ -d ../RomDsk/$platform ] ; then
 fi
 
 echo "adding apps to $romdiskfile"
-for i in assign fdu format mode osldr rtc survey syscopy sysgen talk timer xm inttest ; do
+for i in ${Apps[@]} ; do
+	set +e
 	f=$(../../Tools/unix/casefn.sh ../../Binary/Apps/$i.com)
+	set -e
 	if [ -z "$f" ] ; then
 		echo " " $i "not found"
 	else
