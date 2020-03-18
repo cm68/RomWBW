@@ -6,7 +6,8 @@ SYSTEMS = ../CPM22/cpm_wbw.sys ../ZSDOS/zsys_wbw.sys ../CPM3/cpmldr.sys
 FDIMGS = fd_cpm22.img fd_zsdos.img fd_nzcom.img \
 	fd_cpm3.img fd_zpm3.img fd_ws4.img
 HDIMGS = hd_cpm22.img hd_zsdos.img hd_nzcom.img \
-	hd_cpm3.img hd_zpm3.img hd_ws4.img hd_bp.img
+	hd_cpm3.img hd_zpm3.img hd_ws4.img
+# HDIMGS += hd_bp.img
 
 OBJECTS = $(FDIMGS) $(HDIMGS) hd_combo.img
 OTHERS = blank144 blankhd
@@ -72,9 +73,7 @@ blankhd:
 	if [ -f d_$$d.txt ] ; then \
 		echo " " copying files from d_$$d.txt ; \
 		grep -v ^# d_$$d.txt | tr -d '\r' | while read file user ; do \
-			hack= ; \
-			if [ "$$file" = "../../Binary/Apps/Tunes/*.*" ] ; then hack=../../Binary/Apps/Tunes/Makefile ; fi ; \
-			rf=$$($(CASEFN) $$hack $$file | sort -V) ; \
+			rf=$$($(CASEFN) $$file | sort -V) ; \
 			echo "    " $$rf ; \
 			if [ -z "$$rf" ] ; then \
 				echo " " $$file missing ; \

@@ -201,8 +201,8 @@ if ($Platform -ne "UNA")
 
 "Building ${RomSize}KB ${RomName} ROM disk data file..."
 
-# Use the blank ROM disk image to create a working ROM disk image
-Copy-Item $BlankROM $RomDiskFile
+# Create a blank ROM disk image to create a working ROM disk image
+Set-Content -Value ([byte[]](0xE5) * (([int]${RomSize} * 1KB) - 128KB)) -Encoding byte -Path $RomDiskFile
 
 # Copy all files from the appropriate directory to the working ROM disk image
 cpmcp -f $RomFmt $RomDiskFile ../RomDsk/ROM_${RomSize}KB/*.* 0:
@@ -238,7 +238,7 @@ else
 {
 	Concat 'hbios_rom.bin','osimg.bin','osimg1.bin','osimg.bin',$RomDiskFile $RomFile
 	Concat 'hbios_app.bin','osimg.bin' $ComFile
-	Concat 'hbios_img.bin','osimg.bin' $ImgFile
+	# Concat 'hbios_img.bin','osimg.bin' $ImgFile
 }
 
 # Remove the temporary working ROM disk file
