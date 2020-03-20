@@ -1,4 +1,4 @@
-OBJECTS = PropIO.eeprom PropIO2.eeprom ParPortProp.eeprom
+OBJECTS = PropIO.eeprom PropIO2.eeprom ParPortProp.eeprom ParPortProp2.eeprom
 OTHERS = *.list
 DEST = ../../../Binary
 TOOLS = ../../../Tools
