@@ -6,11 +6,6 @@
 ; TODO:
 ;   1) ADD SUPPORT FOR DSKY
 ;
-; adding support for USB and WIZNET
-;
-; i reuse the sector buffer for data payload
-; i have my own command/response buffer for the various commands I send to the SPI.
-;
 
 PPP_IO		.EQU	PPIBASE + 0	; PPP DATA I/O (PPI PORT A)
 PPP_CTL		.EQU	PPIBASE + 2	; PPP CTL LINES (PPI PORT C)
@@ -46,6 +41,9 @@ PPP_CMDSIORXST	.EQU	$53		; SERIAL PORT RECEIVE STATUS (RETURNS # BYTES OF RX BUF
 PPP_CMDSIOTXST	.EQU	$54		; SERIAL PORT TRANSMIT STATUS (RETURNS # BYTES OF TX BUFFER SPACE AVAILABLE)
 PPP_CMDSIORXFL	.EQU	$55		; SERIAL PORT RECEIVE BUFFER FLUSH
 PPP_CMDSIOTXFL	.EQU	$56		; SERIAL PORT TRANSMIT BUFFER FLUSH (NOT IMPLEMENTED)
+;
+;
+PPP_XFERSPI		.EQU	$60		; transfer an SPI command and data to/from propeller
 ;
 PPP_CMDRESET	.EQU	$F0		; SOFT RESET PROPELLER
 PPP_CMDVER	.EQU	$F1		; SEND FIRMWARE VERSION
@@ -99,7 +97,7 @@ PPP_INIT1:
 ;
 	RET
 ;
-;
+; initialize the prop board and return Z on success
 ;
 PPP_INITPPP:
 	; SETUP PARALLEL PORT (8255)
@@ -129,7 +127,7 @@ PPP_INITPPP:
 	XOR	A			; SIGNAL SUCCESS
 	RET
 ;
-;
+; detect the propeller and return Z on success
 ;
 PPP_DETECT:
 	LD	BC,4096			; TRY FOR ABOUT 4 SECONDS
@@ -155,7 +153,7 @@ PPP_DETECT2:
 	OR	$FF			; SIGNAL FAILURE
 	RET
 ;
-;
+; send the get version command to the propeller and read 4 bytes of response
 ;
 PPP_GETVER:
 #IF (PPPSDTRACE >= 3)
@@ -183,7 +181,7 @@ PPP_GETVER1:
 	XOR	A			; SIGNAL SUCCESS
 	RET
 ;
-;
+; send a command in D to the propeller
 ;
 PPP_SNDCMD:
 	IN	A,(PPP_IO)		; DISCARD ANYTHING PENDING
@@ -214,7 +212,7 @@ PPP_SNDCMD1:
 	XOR	A			; SIGNAL SUCCESS
 	RET
 ;
-;
+; send a byte in A to the propeller
 ;
 PPP_PUTBYTE:
 	PUSH	AF
@@ -226,7 +224,7 @@ PPP_PUTBYTE1:
 	OUT	(PPP_IO),A
 	RET
 ;
-;
+; get a byte from the propeller
 ;
 PPP_GETBYTE:
 	IN	A,(PPP_CTL)
@@ -248,6 +246,13 @@ PPP_STR_NOHW		.TEXT	" NOT PRESENT$"
 PPP_STR_UPGRADE		.TEXT	" !!!UPGRADE REQUIRED!!!$"
 ;
 PPP_FWVER		.DB	$00, $00, $00, $00	; MMNNBBB (M=MAJOR, N=MINOR, B=BUILD)
+;
+;==================================================================================================
+; PARPORTPROP SPI DRIVER
+;==================================================================================================
+;
+PPP_SPI:
+	ret
 ;
 ;==================================================================================================
 ; PARPORTPROP CONSOLE DRIVER
@@ -1067,7 +1072,6 @@ PPPSD_PRTSTAT2:
 	CALL	PC_SPACE
 	JP	PPPSD_PRTERRCODE
 	RET
-
 ;
 ;
 ;
