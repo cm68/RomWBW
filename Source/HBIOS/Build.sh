@@ -126,7 +126,7 @@ fi
 echo "adding apps to $romdiskfile"
 for i in ${Apps[@]} ; do
 	set +e
-	f=$(../../Tools/unix/casefn.sh ../../Binary/Apps/$i.com)
+	f=$(../../Tools/unix/casefn.sh ../../Binary/Apps/$i.com | head -1)
 	set -e
 	if [ -z "$f" ] ; then
 		echo " " $i "not found"
