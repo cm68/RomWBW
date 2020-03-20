@@ -1756,6 +1756,8 @@ HB_DISPCALL:
 	CALL	C,PANIC			; OBSOLETE!
 	CP	BF_VDA + $10		; $40-$4F: VIDEO DISPLAY ADAPTER
 	JP	C,VDA_DISPATCH
+	CP	BF_SPI				; $50-$5F: spi device
+	JP	C,SPI_DISPATCH
 	CP	BF_SYS			; SKIP TO BF_SYS VALUE AT $F0
 	CALL	C,PANIC			; PANIC IF LESS THAN BF_SYS
 	JP	SYS_DISPATCH		; OTHERWISE SYS CALL
@@ -2125,6 +2127,18 @@ RTC_DISPATCH:
 	JP	BQRTC_DISPATCH
 #ENDIF
 	;CALL	PANIC
+	OR	$FF
+	RET
+;
+;==================================================================================================
+; SPI device abstraction
+;==================================================================================================
+;
+SPI_DISPATCH:
+#IF (SPIENABLE)
+	JP	SPI_XFER
+#ENDIF
+	CALL	PANIC
 	OR	$FF
 	RET
 ;
@@ -3093,6 +3107,14 @@ SIZ_MD		.EQU	$ - ORG_MD
 		.ECHO	" bytes.\n"
 #ENDIF
 ;
+#IF (SPIENABLE)
+ORG_SPI	.EQU	$
+  #INCLUDE "spi.asm"
+SIZ_SPI	.EQU	$ - ORG_SPI
+		.ECHO	"SPI occupies "
+		.ECHO	SIZ_SPI
+		.ECHO	" bytes.\n"
+#ENDIF
 #IF (FDENABLE)
 ORG_FD		.EQU	$
   #INCLUDE "fd.asm"
